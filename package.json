@@ -1,6 +1,6 @@
 {
     "name": "cassanova",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "description": "An object modeler for Cassandra CQL.",
     "author": "Incroud team <james@incroud.com>",
     "homepage": "http://github.com/incroud/cassanova",
@@ -38,14 +38,13 @@
         "url" : "https://github.com/incroud/cassanova/issues"
     },
     "dependencies": {
+        "lodash": "2.4.1",
+        "priam": "git+https://github.com/incroud/node-priam.git"
+    },
+    "devDependencies": {
         "async": "0.9.0",
         "commander": "2.3.0",
         "config": "^1.0.0",
-        "lodash": "2.4.1",
-        "priam": "git+https://github.com/incroud/node-priam.git",
-        "progress": "1.1.7"
-    },
-    "devDependencies": {
         "heapdump": "0.2.9",
         "grunt-mocha-istanbul": "1.5.0",
         "grunt-githooks": "0.3.1",
@@ -53,6 +52,7 @@
         "grunt-contrib-clean": "0.5.0",
         "grunt-contrib-jshint": "0.10.0",
         "mocha": "1.20.1",
+        "progress": "1.1.7",
         "should": "4.0.4"
     },
     "scripts": {
