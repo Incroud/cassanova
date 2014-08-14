@@ -1,6 +1,6 @@
 {
     "name": "cassanova",
-    "version": "0.5.2",
+    "version": "0.5.3",
     "description": "An object modeler for Cassandra CQL.",
     "author": "Incroud team <james@incroud.com>",
     "homepage": "http://github.com/incroud/cassanova",
@@ -39,7 +39,7 @@
     },
     "dependencies": {
         "lodash": "2.4.1",
-        "priam": "git+https://github.com/incroud/node-priam.git"
+        "priam": "0.8.13"
     },
     "devDependencies": {
         "async": "0.9.0",
