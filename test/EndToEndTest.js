@@ -5,6 +5,7 @@
 var should = require('should'),
     exec = require('child_process').exec,
     Cassanova = require('../index'),
+    Query = require('../lib/query'),
     common = require("./lib/common"),
     userModel;
 
@@ -65,7 +66,25 @@ describe("Cassanova End To End Tests",function(){
         });
     });
 
+    it("Should throw error for attempting a process a key that does not exist, when validation is skipped", function(done) {
+
+        Query.skipSchemaValidation = true;
+        (function(){
+            userModel.save({
+                uname : 'James'
+            }, function(err, result){
+                if(err){
+                    console.log(err);
+                }
+                (err === null).should.equal(true);
+            });
+        }).should.throw("Attempted to process a key that is not a part of the schema, uname, with value of James");
+        done();
+    });
+
     it("Should be able to insert a user in db via the instance method", function(done) {
+        Query.skipSchemaValidation = false;
+
         userModel.save({
             username : 'James',
             password : 'password',
