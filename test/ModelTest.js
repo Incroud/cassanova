@@ -101,5 +101,46 @@ describe("Cassanova Model Tests", function(){
 
         done();
     });
+    it("Should generate a proper find where query", function(done) {
+        var table,
+            schema = new Schema({
+                id: Schema.Type.UUID().PRIMARY_KEY(),
+                username: Schema.Type.TEXT(),
+                fname: Schema.Type.TEXT()
+            }),
+            model,
+            query,
+            query2;
+
+        table = new Table("users", schema);
+        model = new Model("qModel", table);
+        query = model.find({username:"jeb"}, {execute:false});
+        query2 = model.find({username:"jeb", fname:"James"}, {execute:false});
+
+        query.toString().should.equal("SELECT * FROM users WHERE username = 'jeb';");
+        query2.toString().should.equal("SELECT * FROM users WHERE username = 'jeb' AND fname = 'James';");
+
+        done();
+    });
+    it("Should generate a proper find query without WHERE", function(done) {
+        var table,
+            schema = new Schema({
+                id: Schema.Type.UUID().PRIMARY_KEY(),
+                username: Schema.Type.TEXT()
+            }),
+            model,
+            query,
+            query2;
+
+        table = new Table("users", schema);
+        model = new Model("qModel", table);
+        query = model.find(null, {execute:false});
+        query2 = model.find({}, {execute:false});
+
+        query.toString().should.equal("SELECT * FROM users;");
+        query2.toString().should.equal("SELECT * FROM users;");
+
+        done();
+    });
 });
 
