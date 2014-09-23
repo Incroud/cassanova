@@ -5,7 +5,7 @@ var _ = require('lodash'),
     Table = require("./lib/table"),
     EventEmitter = require('events').EventEmitter,
     util = require('util'),
-    cql = require('priam'),
+    driver = require('cassandra-driver'),
     noop = function(){};
 
 /**
@@ -34,18 +34,54 @@ util.inherits(Cassanova, EventEmitter);
  * @return {Client}         The newly created client.
  */
 Cassanova.prototype.createClient = function(options){
-    if(!options || !options.hosts){
-        throw new Error("Creating a client requires host and keyspace information when being created.");
+    var authProvider,
+        port,
+        host,
+        hosts,
+        len,
+        i;
+
+    //NEW DRIVER CHANGE: Backwards compatibility. In the new driver, hosts has become contactPoints
+    if(options.hosts){
+        console.warn("options.hosts has been deprecated. Please use options.contactPoints and options.protocolOptions when creating connections.");
+    }
+
+    //Lets parse the deprecated code into the new structure.
+    if(!options.contactPoints && options.hosts){
+        options.contactPoints = [];
+        hosts = options.hosts;
+        len = hosts.length;
+
+        for(i=0; i<len; i++){
+            host = hosts[i].split(":");
+            if(!port){
+                port = host[1];
+            }
+            options.contactPoints.push(host[0]);
+        }
+        options.protocolOptions = { port:port };
+        delete options.hosts;
+    }
+console.log(options);
+    //NEW DRIVER CHANGE: New driver has changed how authentication works.
+    if(!options.authProvider && options.username && options.password){
+        console.warn("options.username & options.password has been deprecated. Please use options.authProvider when creating connections.");
+        authProvider = new driver.auth.PlainTextAuthProvider(options.username, options.password);
+        options.authProvider = authProvider;
+    }
+
+    if(!options || !options.contactPoints){
+        throw new Error("Creating a client requires contactPoint information when being created.");
     }
 
     if(!options.keyspace){
         cassanova.emit('log', 'warn', "keyspace has not been defined in the config.");
     }
-
+console.log(options);
     this.options = options;
     Query.skipSchemaValidation = options.skipSchemaValidation || false;
-    
-    this.client = new cql({config:options});
+
+    this.client = new driver.Client(options);
     this.client.on('log', function(level, message) {
         cassanova.emit('log', level, message);
     });
@@ -77,7 +113,6 @@ Cassanova.prototype.isConnected = function(){
  * @param  {Function} callback Called upon initialization.
  */
 Cassanova.prototype.connect = function(options, callback){
-    
     if (arguments.length < 2){
         callback = options;
         options = {};
@@ -90,7 +125,7 @@ Cassanova.prototype.connect = function(options, callback){
         callback(null, true);
         return;
     }
-    this.client.connect(options.keyspace, callback);
+    this.client.connect(callback);
 };
 
 /**
@@ -100,7 +135,7 @@ Cassanova.prototype.disconnect = function(callback){
     if(!this.client){
         return callback(new Error("No client to disconnect."), null);
     }
-    
+
     this.client.close(callback);
 };
 
@@ -132,7 +167,7 @@ Cassanova.prototype.Table = function(name, schema){
             throw new Error("Attempting to overwrite the schema for table : " + name);
         }
     }
-    
+
     table_obj = new Table(name, schema, this.client);
 
     this.tables[name] = table_obj;
@@ -151,7 +186,7 @@ Cassanova.prototype.Model = function (name, table){
     var _name = name,
         _table = table,
         _model = _name ? this.models[_name] : null;
-        
+
     if(!_name || typeof _name !== "string"){
         throw new Error("Attempted to create a model with an invalid name.");
     }
