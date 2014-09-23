@@ -6,7 +6,6 @@ var _ = require('lodash'),
     Table = require("./lib/table"),
     EventEmitter = require('events').EventEmitter,
     util = require('util'),
-    utils = require("./lib/utils"),
     driver = require('cassandra-driver'),
     noop = function(){};
 
@@ -225,7 +224,7 @@ Cassanova.prototype.cql = function(query, options, callback){
 
     this.client.execute(query, null, options, function(err, result){
         if(!err){
-            result = utils.scrubCollectionData(result.rows);
+            result = Query.utils.scrubCollectionData(result.rows);
         }
         callback(err, result);
     });
@@ -242,7 +241,7 @@ Cassanova.prototype.execute = function(query, options, callback){
 
     this.client.execute(query.toString(), null, options, function(err, result){
         if(!err){
-            result = utils.scrubCollectionData(result.rows);
+            result = Query.utils.scrubCollectionData(result.rows);
         }
         callback(err, result);
     });
@@ -260,7 +259,7 @@ Cassanova.prototype.executeAsPrepared = function(query, options, callback){
 
     this.client.execute(query.toString(), null, options, function(err, result){
         if(!err){
-            result = utils.scrubCollectionData(result.rows);
+            result = Query.utils.scrubCollectionData(result.rows);
         }
         callback(err, result);
     });
@@ -287,7 +286,7 @@ Cassanova.prototype.executeBatch = function(queries, options, callback){
 
     this.client.batch(queryBatch, options, function(err, result){
         if(!err){
-            result = utils.scrubCollectionData(result.rows);
+            result = Query.utils.scrubCollectionData(result.rows);
         }
         callback(err, result);
     });
