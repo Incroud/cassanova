@@ -38,6 +38,7 @@
         "url" : "https://github.com/incroud/cassanova/issues"
     },
     "dependencies": {
+        "colors": "0.6.2",
         "lodash": "2.4.1",
         "cassandra-driver": "1.0.*"
     },

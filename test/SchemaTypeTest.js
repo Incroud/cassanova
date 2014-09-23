@@ -262,6 +262,10 @@ describe("Cassanova SchemaType Tests", function(){
                 result3 = sType3.validate([123]),
                 result4 = sType3.validate(["abc"]);
 
+            (function(){
+                SchemaType.LIST("list");
+            }).should.throw("List requires a SchemaType as it's argument.");
+
             (sType instanceof SchemaType).should.equal(true);
             (sType.type).should.equal("list");
             (sType.wrapper).should.equal(SchemaType.WRAPPERS.BRACKETS);
@@ -288,6 +292,10 @@ describe("Cassanova SchemaType Tests", function(){
                 result7 = sType3.validate([{"age":37}]),
                 result8 = sType3.validate([{"age":"def"}]);
 
+            (function(){
+                SchemaType.MAP("text", "text");
+            }).should.throw("Map requires key and value SchemaTypes as it's arguments.");
+
             (sType instanceof SchemaType).should.equal(true);
             (sType.type).should.equal("map");
             (sType.wrapper).should.equal(SchemaType.WRAPPERS.CURLY_BRACKETS);
@@ -313,6 +321,10 @@ describe("Cassanova SchemaType Tests", function(){
                 sType2 = SchemaType.SET(SchemaType.TEXT()).PRIMARY_KEY(),
                 result5 = sType2.validate([123, "abc"]),
                 result6 = sType2.validate(["abc", "def"]);
+
+            (function(){
+                SchemaType.SET("text");
+            }).should.throw("Set requires a SchemaType as it's argument.");
 
             (sType instanceof SchemaType).should.equal(true);
             (sType.type).should.equal("set");

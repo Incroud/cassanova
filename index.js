@@ -1,10 +1,12 @@
 var _ = require('lodash'),
+    colors = require('colors'),
     Query = require('./lib/query'),
     Model = require('./lib/model'),
     Schema = require("./lib/schema"),
     Table = require("./lib/table"),
     EventEmitter = require('events').EventEmitter,
     util = require('util'),
+    utils = require("./lib/utils"),
     driver = require('cassandra-driver'),
     noop = function(){};
 
@@ -43,7 +45,7 @@ Cassanova.prototype.createClient = function(options){
 
     //NEW DRIVER CHANGE: Backwards compatibility. In the new driver, hosts has become contactPoints
     if(options.hosts){
-        console.warn("options.hosts has been deprecated. Please use options.contactPoints and options.protocolOptions when creating connections.");
+        console.warn("DEPRECATION: ".bold.cyan, "options.hosts has been deprecated. Please use options.contactPoints and options.protocolOptions when creating connections.".cyan);
     }
 
     //Lets parse the deprecated code into the new structure.
@@ -62,7 +64,7 @@ Cassanova.prototype.createClient = function(options){
         options.protocolOptions = { port:port };
         delete options.hosts;
     }
-console.log(options);
+
     //NEW DRIVER CHANGE: New driver has changed how authentication works.
     if(!options.authProvider && options.username && options.password){
         console.warn("options.username & options.password has been deprecated. Please use options.authProvider when creating connections.");
@@ -77,7 +79,7 @@ console.log(options);
     if(!options.keyspace){
         cassanova.emit('log', 'warn', "keyspace has not been defined in the config.");
     }
-console.log(options);
+
     this.options = options;
     Query.skipSchemaValidation = options.skipSchemaValidation || false;
 
@@ -103,8 +105,7 @@ Cassanova.prototype.isConnected = function(){
     if(!this.client){
         return false;
     }
-
-    return !_.isEmpty(this.client.pools);
+    return this.client.connected;
 };
 
 /**
@@ -114,7 +115,7 @@ Cassanova.prototype.isConnected = function(){
  */
 Cassanova.prototype.connect = function(options, callback){
     if (arguments.length < 2){
-        callback = options;
+        callback = _.isFunction(options) ? options : noop;
         options = {};
     }
     if(!this.client){
@@ -136,7 +137,11 @@ Cassanova.prototype.disconnect = function(callback){
         return callback(new Error("No client to disconnect."), null);
     }
 
-    this.client.close(callback);
+    if(!this.isConnected()){
+        return callback(null, true);
+    }
+
+    this.client.shutdown(callback);
 };
 
 /**
@@ -210,129 +215,123 @@ Cassanova.prototype.Query = function(){
     return new Query();
 };
 
-/**
- * Used to get direct access to the driver.
- * @return {Object} The cql drive/
- */
-Cassanova.prototype.getDriver = function(){
-    if(!this.client){
-        return null;
+Cassanova.prototype.cql = function(query, options, callback){
+    if (arguments.length < 3){
+        callback = _.isFunction(options) ? options : noop;
+        options = {};
     }
-    return this.client.pools.default || this.client.pools[this.options.keyspace];
+    options = (!_.isObject(options)) ? {} : options;
+    options.consistency = options.consistency || this.consistencies.default;
+
+    this.client.execute(query, null, options, function(err, result){
+        if(!err){
+            result = utils.scrubCollectionData(result.rows);
+        }
+        callback(err, result);
+    });
 };
 
 Cassanova.prototype.execute = function(query, options, callback){
     if (arguments.length < 3){
-        callback = options;
+        callback = _.isFunction(options) ? options : noop;
         options = {};
     }
     options = (!_.isObject(options)) ? {} : options;
 
     options.consistency = options.consistency || this.consistencies.default;
 
-    var driver = this.getDriver();
-
-    this.client.cql(query.toString(), null, options, callback);
+    this.client.execute(query.toString(), null, options, function(err, result){
+        if(!err){
+            result = utils.scrubCollectionData(result.rows);
+        }
+        callback(err, result);
+    });
 };
 
 Cassanova.prototype.executeAsPrepared = function(query, options, callback){
     if (arguments.length < 3){
-        callback = options;
+        callback = _.isFunction(options) ? options : noop;
         options = {};
     }
     options = (!_.isObject(options)) ? {} : options;
 
+    options.prepare = true;
     options.consistency = options.consistency || this.consistencies.default;
-    options.executeAsPrepared = true;
 
-    this.client.cql(query.toString(), null, options, callback);
+    this.client.execute(query.toString(), null, options, function(err, result){
+        if(!err){
+            result = utils.scrubCollectionData(result.rows);
+        }
+        callback(err, result);
+    });
 };
 
 Cassanova.prototype.executeBatch = function(queries, options, callback){
-    var queryBatch = this.client.beginBatch(),
-        consistency;
+    var queryBatch = [],
+        len = queries.length,
+        query,
+        i;
 
     if (arguments.length < 3){
-        callback = options;
+        callback = _.isFunction(options) ? options : noop;
         options = {};
     }
     options = (!_.isObject(options)) ? {} : options;
-    callback = callback || noop;
 
-    consistency = (options && options.consistency) || this.consistencies.default;
+    options.consistency = (options && options.consistency) || this.consistencies.default;
 
-    queries.map(function(query){
-        queryBatch = queryBatch.addQuery(cassanova.client.beginQuery().query(query.toString()));
-    });
+    for(i=0; i<len; i++){
+        query = queries[i];
+        queryBatch.push(query.toString());
+    }
 
-    queryBatch.consistency(consistency).execute(function(err,result){
+    this.client.batch(queryBatch, options, function(err, result){
+        if(!err){
+            result = utils.scrubCollectionData(result.rows);
+        }
         callback(err, result);
     });
 };
 
 Cassanova.prototype.executeEachRow = function(query, options, rowCallback, endCallback){
-    var driver = this.getDriver(),
-        consistency;
-
     if (arguments.length < 4){
-        endCallback = rowCallback;
-        rowCallback = options;
+        endCallback = _.isFunction(rowCallback) ? rowCallback : noop;
+        rowCallback = _.isFunction(options) ? options : noop;
         options = {};
     }
     options = (!_.isObject(options)) ? {} : options;
 
-    if(!driver){
-        if(endCallback){
-            return endCallback(new Error("Client has not been created yet. Use Cassanova.createClient([options]);"), false);
-        }
-        throw new Error("Client has not been created yet. Use Cassanova.createClient([options]);");
-    }
+    options.consistency = options.consistency || this.consistencies.default;
 
-    consistency = options.consistency || this.consistencies.default;
-
-    driver.eachRow(query.toString(), null, consistency, rowCallback, endCallback);
+    this.client.eachRow(query.toString(), null, options, rowCallback, endCallback);
 };
 
 Cassanova.prototype.executeStreamField = function(query, options, rowCallback, endCallback){
-    var driver = this.getDriver(),
-        consistency;
-
-    if (arguments.length < 4){
-        endCallback = rowCallback;
-        rowCallback = options;
-        options = {};
-    }
-    options = (!_.isObject(options)) ? {} : options;
-
-    if(!driver){
-        if(endCallback){
-            return endCallback(new Error("Client has not been created yet. Use Cassanova.createClient([options]);"), false);
-        }
-        throw new Error("Client has not been created yet. Use Cassanova.createClient([options]);");
-    }
-
-    consistency = options.consistency || this.consistencies.default;
-
-    driver.streamField(query.toString(), null, consistency, rowCallback, endCallback);
+    throw new Error("executeStreamField is no longer supported by the driver.");
 };
 
 Cassanova.prototype.executeStream = function(query, options, callback){
-    var driver = this.getDriver(),
-        consistency;
-
-    if(!driver){
-        return callback(new Error("Client has not been created yet. Use Cassanova.createClient([options]);"), false);
-    }
+    var consistency;
 
     if (arguments.length < 3){
-        callback = options;
+        callback = _.isFunction(options) ? options : noop;
         options = {};
     }
     options = (!_.isObject(options)) ? {} : options;
 
-    consistency = options.consistency || this.consistencies.default;
+    options.consistency = options.consistency || this.consistencies.default;
 
-    driver.stream(query.toString(), null, consistency, callback);
+    return this.client.stream(query.toString(), null, options)
+        .on('end', function(){
+            if(callback){
+                callback(null, true);
+            }
+        })
+        .on('error', function(err){
+            if(callback){
+                callback(err, false);
+            }
+        });
 };
 
 Cassanova.prototype.consistencies = Query.consistencies;

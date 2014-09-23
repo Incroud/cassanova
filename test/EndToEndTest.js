@@ -139,7 +139,7 @@ describe("Cassanova End To End Tests",function(){
     });
 
     it("Should be able to find a user in db using a chained query via the static method", function(done) {
-        userModel.find({username:"James", email:"google@gmail.com"}, {}).execute(function(err, result){
+        userModel.find({username:"James", email:"google@gmail.com"}, function(err, result){
             if(err){
                 console.log(err);
             }
@@ -150,7 +150,7 @@ describe("Cassanova End To End Tests",function(){
     });
 
     it("Should be able to find a user in db using a chained query via the instance method", function(done) {
-        userModel.find({username:"James", email:"google@gmail.com"}).execute(function(err, result){
+        userModel.find({username:"James", email:"google@gmail.com"}, function(err, result){
             if(err){
                 console.log(err);
             }
@@ -237,6 +237,17 @@ describe("Cassanova End To End Tests",function(){
         });
     });
 
+    it('Should be able to run queries in batch with noop callback',function(done){
+        var query1 = userModel.Query();
+
+        query1.INSERT({username:"James", firstname:"James", lastname:"Booth"});
+        var query2 = userModel.Query();
+        query2.INSERT({username:"Karan", firstname:"Karan", lastname:"Keswani"});
+
+        Cassanova.executeBatch([query1, query2]);
+        done();
+    });
+
     it('Should be able to run queries in batch without options argument',function(done){
         var query1 = userModel.Query();
 
@@ -266,6 +277,14 @@ describe("Cassanova End To End Tests",function(){
         });
     });
 
+    it('Should be able to execute with noop callback',function(done){
+        var query = userModel.Query();
+        query.INSERT({username:"James1", firstname:"James", lastname:"Booth"});
+
+        Cassanova.execute(query);
+        done();
+    });
+
     it('Should be able to execute without options argument',function(done){
         var query = userModel.Query();
         query.INSERT({username:"James1", firstname:"James", lastname:"Booth"});
@@ -290,6 +309,14 @@ describe("Cassanova End To End Tests",function(){
             (err === null).should.equal(true);
             done();
         });
+    });
+
+    it('Should be able to executeAsPrepared with noop callback',function(done){
+        var query = userModel.Query();
+        query.INSERT({username:"James2", firstname:"James", lastname:"Booth"});
+
+        Cassanova.executeAsPrepared(query);
+        done();
     });
 
     it('Should be able to executeAsPrepared without options argument',function(done){
@@ -318,6 +345,14 @@ describe("Cassanova End To End Tests",function(){
         });
     });
 
+    it('Should be able to executeStream with noop callback',function(done){
+        var query = userModel.Query();
+        query.INSERT({username:"James2", firstname:"James", lastname:"Booth"});
+
+        Cassanova.executeStream(query);
+        done();
+    });
+
     it('Should be able to executeStream without options argument',function(done){
         var query = userModel.Query();
         query.INSERT({username:"James2", firstname:"James", lastname:"Booth"});
@@ -344,6 +379,14 @@ describe("Cassanova End To End Tests",function(){
         });
     });
 
+    it('Should be able to executeEachRow with noop callback',function(done){
+        var query = userModel.Query();
+        query.SELECT("*");
+
+        Cassanova.executeEachRow(query);
+        done();
+    });
+
     it('Should be able to executeEachRow without options argument',function(done){
         var query = userModel.Query();
         query.SELECT("*");
@@ -361,25 +404,10 @@ describe("Cassanova End To End Tests",function(){
         var query = userModel.Query();
         query.SELECT("*");
 
-        Cassanova.executeStreamField(query, null, function(n, row){}, function(err, rowLength){
-            if(err){
-                console.log(err);
-            }
-            (err === null).should.equal(true);
-            done();
-        });
-    });
+        (function(){
+            Cassanova.executeStreamField(query);
+        }).should.throw("executeStreamField is no longer supported by the driver.");
 
-    it('Should be able to executeStreamField without options argument',function(done){
-        var query = userModel.Query();
-        query.SELECT("*");
-
-        Cassanova.executeStreamField(query, function(n, row){}, function(err, rowLength){
-            if(err){
-                console.log(err);
-            }
-            (err === null).should.equal(true);
-            done();
-        });
+        done();
     });
 });
