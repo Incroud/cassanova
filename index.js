@@ -56,7 +56,7 @@ Cassanova.prototype.createClient = function(options){
             }
             options.contactPoints.push(host[0]);
         }
-        if(port){
+        if(!options.port){
             options.protocolOptions = { port:port };
         }
 
