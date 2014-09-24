@@ -60,7 +60,7 @@ describe("Cassanova Models", function(){
 
         (function(){
             Cassanova.createClient({});
-        }).should.throw("Creating a client requires contactPoint information when being created.");
+        }).should.throw("Creating a client requires hosts information when being created.");
 
         done();
     });
@@ -69,7 +69,7 @@ describe("Cassanova Models", function(){
 
         (function(){
             Cassanova.connect(function(err, result){});
-        }).should.throw("Creating a client requires contactPoint information when being created.");
+        }).should.throw("Creating a client requires hosts information when being created.");
 
         done();
     });

@@ -42,13 +42,9 @@ Cassanova.prototype.createClient = function(options){
         len,
         i;
 
-    //NEW DRIVER CHANGE: Backwards compatibility. In the new driver, hosts has become contactPoints
+    //Lets parse the hosts code into the new driver structure.
+    //Let's attempt to determine the port from the hosts
     if(options.hosts){
-        console.warn("DEPRECATION: ".bold.cyan, "options.hosts has been deprecated. Please use options.contactPoints and options.protocolOptions when creating connections.".cyan);
-    }
-
-    //Lets parse the deprecated code into the new structure.
-    if(!options.contactPoints && options.hosts){
         options.contactPoints = [];
         hosts = options.hosts;
         len = hosts.length;
@@ -60,19 +56,31 @@ Cassanova.prototype.createClient = function(options){
             }
             options.contactPoints.push(host[0]);
         }
-        options.protocolOptions = { port:port };
+        if(port){
+            options.protocolOptions = { port:port };
+        }
+
         delete options.hosts;
     }
 
-    //NEW DRIVER CHANGE: New driver has changed how authentication works.
-    if(!options.authProvider && options.username && options.password){
-        console.warn("options.username & options.password has been deprecated. Please use options.authProvider when creating connections.");
+    if(options.port){
+        options.protocolOptions = { port:options.port };
+        delete options.port;
+    }
+
+    if(options.username && options.password){
         authProvider = new driver.auth.PlainTextAuthProvider(options.username, options.password);
         options.authProvider = authProvider;
+        delete options.username;
+        delete options.password;
     }
 
     if(!options || !options.contactPoints){
-        throw new Error("Creating a client requires contactPoint information when being created.");
+        throw new Error("Creating a client requires hosts information when being created.");
+    }
+
+    if(!options || !options.protocolOptions.port){
+        throw new Error("Creating a client requires port information when being created.");
     }
 
     if(!options.keyspace){
