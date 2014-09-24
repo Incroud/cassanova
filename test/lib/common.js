@@ -1,7 +1,8 @@
 var Cassanova = require('../../index');
 
 exports.options = options = {
-    hosts:["localhost:9042"],
+    hosts:["localhost"],
+    port:9042,
     keyspace:"cassanova_test"
 };
 

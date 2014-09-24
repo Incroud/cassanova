@@ -400,14 +400,24 @@ describe("Cassanova End To End Tests",function(){
         });
     });
 
-    it('Should be able to executeStreamField',function(done){
+    it('Should be able to executeStreamField with noop callback',function(done){
         var query = userModel.Query();
         query.SELECT("*");
 
-        (function(){
-            Cassanova.executeStreamField(query);
-        }).should.throw("executeStreamField is no longer supported by the driver.");
-
+        Cassanova.executeStreamField(query);
         done();
+    });
+
+    it('Should be able to executeStreamField without options argument',function(done){
+        var query = userModel.Query();
+        query.SELECT("*");
+
+        Cassanova.executeStreamField(query, function(n, row){}, function(err, rowLength){
+            if(err){
+                console.log(err);
+            }
+            (err === null).should.equal(true);
+            done();
+        });
     });
 });

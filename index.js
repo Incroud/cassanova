@@ -51,12 +51,13 @@ Cassanova.prototype.createClient = function(options){
 
         for(i=0; i<len; i++){
             host = hosts[i].split(":");
-            if(!port){
+            if(!port && host[1]){
                 port = host[1];
             }
             options.contactPoints.push(host[0]);
         }
-        if(!options.port){
+        if(port && !options.port){
+            console.warn("DEPRECATION: ".bold.cyan, "Use the port config option, instead of host:port.".cyan);
             options.protocolOptions = { port:port };
         }
 
@@ -314,7 +315,18 @@ Cassanova.prototype.executeEachRow = function(query, options, rowCallback, endCa
 };
 
 Cassanova.prototype.executeStreamField = function(query, options, rowCallback, endCallback){
-    throw new Error("executeStreamField is no longer supported by the driver.");
+    console.warn("DEPRECATION: ".bold.cyan, "executeStreamField has been deprecated. The method is no longer available in the driver. The current implementation is identical to executeEachRow.".cyan);
+
+    if (arguments.length < 4){
+        endCallback = _.isFunction(rowCallback) ? rowCallback : noop;
+        rowCallback = _.isFunction(options) ? options : noop;
+        options = {};
+    }
+    options = (!_.isObject(options)) ? {} : options;
+
+    options.consistency = options.consistency || this.consistencies.default;
+
+    this.client.eachRow(query.toString(), null, options, rowCallback, endCallback);
 };
 
 Cassanova.prototype.executeStream = function(query, options, callback){
