@@ -1,6 +1,6 @@
 {
     "name": "cassanova",
-    "version": "0.6.0",
+    "version": "0.6.0-next",
     "description": "An object modeler for Cassandra CQL.",
     "author": "Incroud team <james@incroud.com>",
     "homepage": "http://github.com/incroud/cassanova",
