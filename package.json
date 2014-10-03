@@ -1,6 +1,6 @@
 {
     "name": "cassanova",
-    "version": "0.5.5",
+    "version": "0.6.0",
     "description": "An object modeler for Cassandra CQL.",
     "author": "Incroud team <james@incroud.com>",
     "homepage": "http://github.com/incroud/cassanova",
@@ -38,8 +38,9 @@
         "url" : "https://github.com/incroud/cassanova/issues"
     },
     "dependencies": {
+        "colors": "0.6.2",
         "lodash": "2.4.1",
-        "priam": "0.8.13"
+        "cassandra-driver": "datastax/nodejs-driver#next"
     },
     "devDependencies": {
         "async": "0.9.0",

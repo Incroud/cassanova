@@ -136,6 +136,7 @@ var startCassanova = function(callback){
     opts.username = process.env.CASS_USER || config.db.username;
     opts.password = process.env.CASS_PASS || config.db.password;
     opts.hosts = config.db.hosts;
+    opts.port = config.db.port;
 
     Cassanova.connect(opts, function(err, result){
         callback(err, result);

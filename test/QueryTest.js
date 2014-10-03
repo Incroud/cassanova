@@ -9,21 +9,28 @@ var should = require('should'),
     baseSchema,
     baseTable;
 
-beforeEach(function(done){
-    baseSchema = new Schema({
-        userid : Schema.Type.TEXT(),
-        firstname : Schema.Type.TEXT(),
-        lastname : Schema.Type.TEXT(),
-        age : Schema.Type.INT(),
-        zipcode : Schema.Type.INT(),
-        PRIMARY_KEY : Schema.Type.PRIMARY_KEY("userid")
-    });
-    baseTable = Cassanova.Table("users", baseSchema);
-
-    done();
-});
-
 describe("Cassanova Query Tests", function(){
+
+    before(function(done){
+        baseSchema = new Schema({
+            userid : Schema.Type.TEXT(),
+            firstname : Schema.Type.TEXT(),
+            lastname : Schema.Type.TEXT(),
+            age : Schema.Type.INT(),
+            zipcode : Schema.Type.INT(),
+            PRIMARY_KEY : Schema.Type.PRIMARY_KEY("userid")
+        });
+        baseTable = Cassanova.Table("users", baseSchema);
+        done();
+    });
+
+    after(function(done){
+        Cassanova.tables = {};
+        Cassanova.models = {};
+        Cassanova.schemas = {};
+        done();
+    });
+
     describe("Basic Query Tests", function(){
         it("Should be able to be cloned and chained independently", function(done){
             var schema = new Schema({
@@ -55,7 +62,7 @@ describe("Cassanova Query Tests", function(){
                 username: Schema.Type.TEXT()
             }),
             query = new Query();
-            
+
             query.CREATE_TABLE('users', schema);
 
             (query.toString()).should.equal("CREATE TABLE users (id uuid PRIMARY KEY , username text);");
@@ -68,7 +75,7 @@ describe("Cassanova Query Tests", function(){
                 PRIMARY_KEY: Schema.Type.PRIMARY_KEY("id")
             }),
             query = new Query();
-            
+
             query.CREATE_TABLE('users', schema);
 
             (query.toString()).should.equal("CREATE TABLE users (id uuid, username text, PRIMARY KEY (id));");
@@ -81,7 +88,7 @@ describe("Cassanova Query Tests", function(){
                 PRIMARY_KEY: Schema.Type.PRIMARY_KEY(["id", "username"])
             }),
             query = new Query();
-            
+
             query.CREATE_TABLE('users', schema);
 
             (query.toString()).should.equal("CREATE TABLE users (id uuid, username text, PRIMARY KEY (id, username));");
@@ -95,7 +102,7 @@ describe("Cassanova Query Tests", function(){
                 PRIMARY_KEY: Schema.Type.PRIMARY_KEY([["id", "username"], "age"])
             }),
             query = new Query();
-            
+
             query.CREATE_TABLE('users', schema);
 
             (query.toString()).should.equal("CREATE TABLE users (id uuid, username text, age int, PRIMARY KEY ((id, username), age));");
@@ -108,7 +115,7 @@ describe("Cassanova Query Tests", function(){
                 PRIMARY_KEY: Schema.Type.PRIMARY_KEY("id")
             }),
             query = new Query();
-            
+
             query.CREATE_TABLE('users', schema, true);
 
             (query.toString()).should.equal("CREATE TABLE IF NOT EXISTS users (id uuid, username text, PRIMARY KEY (id));");
@@ -118,7 +125,7 @@ describe("Cassanova Query Tests", function(){
     describe("SELECT Tests",function(){
         it("Should throw error for invalid selector", function(done){
             var query = new Query(baseTable);
-            
+
             (function(){
                 query.SELECT(123);
             }).should.throw("Unsupported selector for SELECT statement. Expected 123 to be of type String or Array.");
@@ -186,7 +193,7 @@ describe("Cassanova Query Tests", function(){
             var query = new Query(baseTable);
 
             query.SELECT(['firstname', 'lastname'], "users").WHERE_EQUALS("firstname", "james").AND().EQUALS("lastname", "booth");
-            
+
             (query.toString()).should.eql("SELECT firstname, lastname FROM users WHERE firstname = 'james' AND lastname = 'booth';");
             done();
         });
@@ -194,7 +201,7 @@ describe("Cassanova Query Tests", function(){
             var query = new Query(baseTable);
 
             query.SELECT(['firstname', 'lastname']).WHERE_EQUALS("firstname", "james").AND().EQUALS("age", 37);
-            
+
             (query.toString()).should.eql("SELECT firstname, lastname FROM users WHERE firstname = 'james' AND age = 37;");
             done();
         });
@@ -208,7 +215,7 @@ describe("Cassanova Query Tests", function(){
         });
         it("Should throw error for a valid SELECT statement with WHERE, and in invalid IN", function(done) {
             var query = new Query(baseTable);
-            
+
             (function(){
                 query.SELECT(['firstname', 'lastname']).WHERE_EQUALS("firstname", "james").IN();
             }).should.throw("The predicate IN requires and Array argument.");
@@ -227,7 +234,7 @@ describe("Cassanova Query Tests", function(){
             var query = new Query(baseTable);
 
             query.SELECT(['firstname', 'lastname']).WHERE_EQUALS("firstname", "james").IN([123,456]);
-            
+
             (query.toString()).should.eql("SELECT firstname, lastname FROM users WHERE firstname = 'james' IN (123, 456);");
             done();
         });
@@ -340,9 +347,9 @@ describe("Cassanova Query Tests", function(){
         });
         it("Should create a valid insert query", function(done) {
             var query = new Query(baseTable);
-            
+
             query.INSERT({firstname:"James", lastname:"Booth", age: 37});
-                
+
             (query.toString()).should.equal("INSERT INTO users (firstname, lastname, age) VALUES ('James', 'Booth', 37);");
             done();
         });
@@ -350,7 +357,7 @@ describe("Cassanova Query Tests", function(){
             var query = new Query(baseTable);
 
             query.INSERT({firstname:"James", lastname:"Booth"}).USING_TTL(86400);
-            
+
             (query.toString()).should.equal("INSERT INTO users (firstname, lastname) VALUES ('James', 'Booth') USING TTL 86400;");
             done();
         });
