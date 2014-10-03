@@ -55,12 +55,12 @@ describe("Cassanova Models", function(){
             done();
         });
     });
-    it("Should throw error when trying to connect without host and keyspace", function(done){
+    it("Should throw error when trying to connect without contactPoints", function(done){
         (Cassanova.isConnected()).should.equal(false);
 
         (function(){
             Cassanova.createClient({});
-        }).should.throw("Creating a client requires host and keyspace information when being created.");
+        }).should.throw("Creating a client requires hosts information when being created.");
 
         done();
     });
@@ -69,7 +69,7 @@ describe("Cassanova Models", function(){
 
         (function(){
             Cassanova.connect(function(err, result){});
-        }).should.throw("Creating a client requires host and keyspace information when being created.");
+        }).should.throw("Creating a client requires hosts information when being created.");
 
         done();
     });
@@ -77,7 +77,7 @@ describe("Cassanova Models", function(){
         (Cassanova.isConnected()).should.equal(false);
 
         Cassanova.connect(common.options, function(err, result){
-            (err === null).should.equal(true);
+            (typeof err === 'undefined').should.equal(true);
             (Cassanova.isConnected()).should.equal(true);
             done();
         });
