@@ -40,7 +40,7 @@
     "dependencies": {
         "colors": "0.6.2",
         "lodash": "2.4.1",
-        "cassandra-driver": "datastax/nodejs-driver#next"
+        "cassandra-driver": "git://github.com/datastax/nodejs-driver.git#next"
     },
     "devDependencies": {
         "async": "0.9.0",
