@@ -93,7 +93,7 @@ Cassanova.prototype.createClient = function(options){
 
     this.client = new driver.Client(options);
     this.client.on('log', function(level, message) {
-        cassanova.emit('log', level, message);
+        cassanova.emit('log', level, Array.prototype.slice.call(arguments).slice(1).join(" : "));
     });
     this.client.on('connectionFailed', function() {
         cassanova.emit('connectionFailed');
