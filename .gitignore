@@ -4,6 +4,6 @@ logs
 .DS_store
 *.orig
 *.heapsnapshot
-
+.idea/
 npm-debug.log
 node_modules

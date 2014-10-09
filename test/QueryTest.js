@@ -451,8 +451,8 @@ describe("Cassanova Query Tests", function(){
             }),
             mapTable = Cassanova.Table("users_map_test", schema),
             query = new Query(mapTable);
-
-            query.INSERT({todo:[{'2013-9-22 12:01'  : 'birthday wishes to Bilbo'}, {'2013-10-1 18:00' : 'Check into Inn of Prancing Pony'}]});
+            var todo = {'2013-9-22 12:01'  : 'birthday wishes to Bilbo', '2013-10-1 18:00' : 'Check into Inn of Prancing Pony'};
+            query.INSERT({ todo:todo});
             (query.toString()).should.equal("INSERT INTO users_map_test (todo) VALUES ({'2013-9-22 12:01' : 'birthday wishes to Bilbo', '2013-10-1 18:00' : 'Check into Inn of Prancing Pony'});");
 
             //Will not throw an exception since in javascript the keys are always converted to strings
@@ -461,7 +461,7 @@ describe("Cassanova Query Tests", function(){
             // }).should.throw("Mismatched key type for todo. Expecting a text");
 
             (function(){
-                query.INSERT({todo:[{'2013-9-22 12:01'  : 'birthday wishes to Bilbo'}, {'2013-10-1 18:00' : 123456789}]});
+                query.INSERT({todo:{'2013-9-22 12:01'  : 'birthday wishes to Bilbo','2013-10-1 18:00' : 123456789}});
             }).should.throw("Mismatched value type for todo. Expecting a text");
 
             done();
