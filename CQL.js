@@ -71,7 +71,7 @@ var processArguments = function(callback){
         output("A keyspace has not been defined. CQL will fail if the keyspace is not defined in the statement.");
     }
 
-    if((!program.files || program.files.length === 0) && (!program.cql || program.cql.length === 0) && (!program.migration || program.migration.length === 0)){
+    if((!program.files || program.files.length === 0) && (!program.cql || program.cql.length === 0)){
         return callback("Need a file to load or cql to run. Use -f=filename or --files=filename,filename or -cql='someCQLStatement;' or --cql='someCQLStatement;'. Run node CQL --help for mode information.", false);
     }else if(process.env.NODE_ENV === 'production' && !program.production){
         return callback("CQL cannot be run while the NODE_ENV is set to production.", false);
