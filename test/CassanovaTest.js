@@ -77,7 +77,7 @@ describe("Cassanova Models", function(){
         (Cassanova.isConnected()).should.equal(false);
 
         Cassanova.connect(common.options, function(err, result){
-            (typeof err === 'undefined').should.equal(true);
+            (err === null).should.equal(true);
             (Cassanova.isConnected()).should.equal(true);
             done();
         });

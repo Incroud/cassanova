@@ -290,7 +290,8 @@ describe("Cassanova SchemaType Tests", function(){
                 result5 = sType3.validate({"abc":"def"}),
                 result6 = sType3.validate({"age":37}),
                 result7 = sType3.validate([{"age":37}]),
-                result8 = sType3.validate([{"age":"def"}]);
+                result8 = sType3.validate([{"age":"def"}]),
+                result9 = sType3.validate({"age":37,"weight":160});
 
             (function(){
                 SchemaType.MAP("text", "text");
@@ -308,6 +309,7 @@ describe("Cassanova SchemaType Tests", function(){
             (result6).should.equal(true);
             (result7).should.equal(true);
             (result8).should.equal(false);
+            (result9).should.equal(true);
             done();
         });
     });

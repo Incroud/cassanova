@@ -23,6 +23,8 @@ try{
 program.on('--help', function(){
     console.log("  Examples:");
     console.log("");
+    console.log("    $ node CQL -k incroud_test                                       Sets the keyspace where the scripts will run.");
+    console.log("    $ node CQL --keyspace incroud_test                               Sets the keyspace where the scripts will run.");
     console.log("    $ node CQL -c 'DROP KEYSPACE IF EXISTS incroud_test;'            Runs a cql script.");
     console.log("    $ node CQL --cql 'DROP KEYSPACE IF EXISTS incroud_test;'         Runs a cql script.");
     console.log("    $ node CQL -f start.cql                                         Runs a cql from a single file.");
@@ -42,6 +44,7 @@ program.on('--help', function(){
 });
 
 program
+    .option('-k, --keyspace "<keyspace>"', "The name of the keyspace to use.")
     .option('-c, --cql "<cqlStatement>"', "Run a single cql statement.")
     .option('-f, --files <path,path>', "Execute a .cql file or sequentially execute a group of .cql files, using comma-delimited paths and no spaces.")
     .option('-s, --silent', "Hide output while executing.", false)
@@ -62,6 +65,10 @@ var processArguments = function(callback){
 
     if(program.cql){
         batchQueries.push(program.cql.toString().trim());
+    }
+
+    if((!program.keyspace || program.keyspace.length === 0)){
+        output("A keyspace has not been defined. CQL will fail if the keyspace is not defined in the statement.");
     }
 
     if((!program.files || program.files.length === 0) && (!program.cql || program.cql.length === 0)){
@@ -129,7 +136,6 @@ var loadFiles = function(callback){
  */
 var startCassanova = function(callback){
     var opts = {};
-
     output("Connecting to database...");
     //We need to be able to do anything with any keyspace. We just need a db connection. Just send
     //in the hosts, username and password, stripping the keyspace.
@@ -139,6 +145,9 @@ var startCassanova = function(callback){
     opts.port = config.db.port;
 
     Cassanova.connect(opts, function(err, result){
+        if(err){
+            err.hosts = opts.hosts;
+        }
         callback(err, result);
     });
 };
@@ -173,6 +182,10 @@ var processQueries = function(callback){
 var runQueries = function(callback){
 
     output("Initializing queries...");
+
+    if(program.keyspace){
+        batchQueries.unshift("USE " + program.keyspace + ";");
+    }
 
     if(batchQueries && batchQueries.length > 0){
         output("Running queries...");
