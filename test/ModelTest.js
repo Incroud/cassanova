@@ -3,21 +3,39 @@
 "use strict";
 
 var should = require('should'),
+    Cassanova = require('../index'),
     common = require("./lib/common"),
     Model = require('../lib/model'),
     Table = require('../lib/table'),
-    Schema = require('../lib/schema');
-
-before(function(done){
-    done();
-});
-
-after(function(done){
-    done();
-});
-
+    Schema = require('../lib/schema'),
+    baseSchema,
+    baseTable;
 
 describe("Cassanova Model Tests", function(){
+    before(function(done){
+        common.connectCassanovaClient(function(){
+                baseSchema = new Schema({
+                userid : Schema.Type.TEXT(),
+                firstname : Schema.Type.TEXT(),
+                lastname : Schema.Type.TEXT(),
+                age : Schema.Type.INT(),
+                zipcode : Schema.Type.INT(),
+                PRIMARY_KEY : Schema.Type.PRIMARY_KEY("userid")
+            });
+            baseTable = Cassanova.Table("users", baseSchema);
+            done();
+        });
+    });
+
+    after(function(done){
+        common.disconnectCassanovaClient(function(){
+            Cassanova.tables = {};
+            Cassanova.models = {};
+            Cassanova.schemas = {};
+            done();
+        });
+    });
+
     it("Should instantiate a model, although the Cassanove.model API should be used", function(done) {
         var table,
             model,

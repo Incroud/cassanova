@@ -96,7 +96,7 @@ describe("Cassanova Schema Tests",function(){
     });
     it("Should throw an error for not using a SchemaType", function(done) {
         var schema;
-        
+
         (function(){
             schema = new Schema({
                 id: "NotASchemaType",
@@ -171,6 +171,57 @@ describe("Cassanova Schema Tests",function(){
         (function(){
             schema.validate(model);
         }).should.not.throw();
+
+        done();
+    });
+    it("Should throw error for unexpected type in the data", function(done) {
+        var schema = new Schema({
+            ascii: Schema.Type.ASCII().PRIMARY_KEY(),
+            bigint: Schema.Type.BIGINT(),
+            blob: Schema.Type.BLOB(),
+            boolean: Schema.Type.BOOLEAN(),
+            counter: Schema.Type.COUNTER(),
+            decimal: Schema.Type.DECIMAL(),
+            double: Schema.Type.DOUBLE(),
+            float: Schema.Type.FLOAT(),
+            inet: Schema.Type.INET(),
+            int: Schema.Type.INT(),
+            list: Schema.Type.LIST(Schema.Type.TEXT()),
+            map: Schema.Type.MAP(Schema.Type.TEXT(), Schema.Type.TEXT()),
+            map2: Schema.Type.MAP(Schema.Type.TEXT(), Schema.Type.TEXT()),
+            set: Schema.Type.SET(Schema.Type.TEXT()),
+            text: Schema.Type.TEXT(),
+            timestamp: Schema.Type.TIMESTAMP(),
+            uuid: Schema.Type.UUID(),
+            timeuuid: Schema.Type.TIMEUUID(),
+            varchar: Schema.Type.VARCHAR(),
+            varint: Schema.Type.VARINT()
+        }),
+        model = {
+            ascii: "abc123",
+            bigint: 123456789,
+            blob: "notReallyABlob",
+            boolean: false,
+            counter: 123,
+            double: 123456789123456789,
+            float: 3.14159,
+            inet: "127.0.0.1",
+            int: 1976,
+            list: ["foo", "bar"],
+            map: ["userid", "age"],
+            map2: {foo:"bar"},
+            set: ["test@email.com", "test2@email.com"],
+            text: "HELLO WORLD",
+            timestamp: "1401238326246",
+            uuid: "550e8400-e29b-41d4-a716-446655440000",
+            timeuuid: "550e8400-e29b-41d4-a716-446655440000",
+            varchar: "Lots o' text can go here.",
+            varint: 1234567890
+        };
+
+        (function(){
+            schema.validate(model);
+        }).should.throw("Expected 1401238326246 to be of type timestamp.");
 
         done();
     });

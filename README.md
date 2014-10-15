@@ -43,21 +43,17 @@ myUserModel.save({id:"80398220-e461-11e3-ac10-0800200c9a66", username:"jeboothjr
 
 `Cassanova.createClient(options)`
 
-A client is created as follows. Internally, the driver manages connections to Cassandra.  `options.hosts` and `options.keyspace` are required.
+A client is created as follows. Internally, the driver manages connections to Cassandra.  `options.hosts`, `options.port` and `options.keyspace` are required. For additional options, please refer to the driver documentation : [nodejs-driver](https://github.com/datastax/nodejs-driver)
 
 ```javascript
 var Cassanova = require('cassanova'),
     options = {
-        hosts: ['localhost:9042'], /* An array of hosts */
-        timeout: 4000, /* optional, defaults to 4000 */
-        poolSize: 1, /* optional, defaults to 1 */
-        consistencyLevel: "one", /* optional, defaults to "one" */
-        numRetries: 3, /* optional, defaults to 0. Retries occur on connection failures. */
-        retryDelay: 100, /* optional, defaults to 100ms. Used on error retry or consistency fallback retry */
-        enableConsistencyFailover: true, /* optional, defaults to true */
-        username: "",
-        password: "",
-        keyspace: "cassanova_ks", /* Default keyspace. */
+        hosts: ['localhost'], /* An array of hosts */
+        port:9042,
+        keyspace: "cassanova_ks", /* The keyspace to use. */
+        username: "", /* optional, the username for cassandra */
+        password: "", /* optional, the password for cassandra */
+
         skipSchemaValidation: true /* optional, defaults to false. Bypasses schema validation */
     };
 
@@ -68,12 +64,13 @@ Cassanova.createClient(options);
 
 `Cassanova.connect([options], callback)`
 
-Creating a connection is as follows. This is not necessary as the driver will automatically connect when a query is executed. If you do not create a client first, you can optional pass in the same options as you would when creating a client and one will be automatically created for you. If options are used, `options.hosts` and `options.keyspace` are required.
+Creating a connection is as follows. This is not necessary as the driver will automatically connect when a query is executed. If you do not create a client first, you can optional pass in the same options as you would when creating a client and one will be automatically created for you. If options are used, `options.hosts`, `options.port` and `options.keyspace` are required.
 
 ```javascript
 var Cassanova = require('cassanova');
 Cassanova.connect({
-    hosts : ['localhost:9042'],
+    hosts : ['localhost'],
+    port : 9042,
     keyspace : 'cassanova_ks'
 },function(error, success){
 
@@ -410,7 +407,8 @@ Addition information regarding the methods below can be found in the [node-cassa
 
 `query` is a *Cassanova.Query* object, `options` current supports `consistency` where the value is one of `Cassanova.consistencies`. rowCallback(n, row) is called for each row as soon as the first chunk of the last field is received, where n is the index of the row. endCallback(err, rowLength) is called when all rows have been received or there is an error retrieving the row.
 
-##### Cassanova.executeStreamField
+##### Cassanova.executeStreamField - DEPRECATED
+##### This method is DEPRECATED. It has been removed from the offical driver. The current functionality is identical to executeEachRow
 
 `Cassanova.executeStreamField(query, [options],  rowCallback, [endCallback])`
 
@@ -455,7 +453,8 @@ Take a look at the test/EndToEndTest.js file. There are a lot of examples in the
 //CREATE KEYSPACE cassanova WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
 $ node repl
 $ var opts = {
-    "hosts" : ["localhost:9042"],
+    "hosts" : ["localhost"],
+    "port" : 9042
     "keyspace" : "cassanova"
 };
 $ Cassanova.connect(opts, function(err, result){
