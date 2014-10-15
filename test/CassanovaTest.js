@@ -127,7 +127,7 @@ describe("Cassanova Models", function(){
         (m1.table.schema.structure.id.type).should.equal(Cassanova.SchemaType.UUID().type);
         (m2.table.schema.structure.id.type).should.equal(Cassanova.SchemaType.UUID().type);
 
-        (m1).should.not.equal(m2);
+        (m1 === m2).should.not.equal(true);
 
         (m1q.toString()).should.equal("INSERT INTO test (id) VALUES (4febf030-e461-11e3-ac10-0800200c9a66);");
         (m2q.toString()).should.equal("INSERT INTO test (id) VALUES (71c20c30-e461-11e3-ac10-0800200c9a66);");
@@ -143,9 +143,9 @@ describe("Cassanova Models", function(){
             MA = new M2(),
             MB = new M2();
 
-        (M1).should.equal(M2);
-        (M2).should.equal(M3);
-        (MA).should.not.equal(MB);
+        (M1 === M2).should.equal(true);
+        (M2 === M3).should.equal(true);
+        (MA === MB).should.not.equal(true);
 
         (typeof M1).should.equal("function");
         (typeof M2).should.equal("function");
