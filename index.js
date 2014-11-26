@@ -313,7 +313,10 @@ Cassanova.prototype.executeEachRow = function(query, options, rowCallback, endCa
 
     this.client.eachRow(query.toString(), null, options, rowCallback, endCallback);
 };
-
+/**
+ * Ignoring in coverage. Deprecating executeStreamField.
+ */
+/* istanbul ignore next  */
 Cassanova.prototype.executeStreamField = function(query, options, rowCallback, endCallback){
     console.warn("DEPRECATION: ".bold.cyan, "executeStreamField has been deprecated. The method is no longer available in the driver. The current implementation is identical to executeEachRow.".cyan);
 

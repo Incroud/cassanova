@@ -404,7 +404,7 @@ describe("Cassanova End To End Tests",function(){
         var query = userModel.Query();
         query.SELECT("*");
 
-        Cassanova.executeStreamField(query);
+        Cassanova.executeEachRow(query);
         done();
     });
 
@@ -412,7 +412,7 @@ describe("Cassanova End To End Tests",function(){
         var query = userModel.Query();
         query.SELECT("*");
 
-        Cassanova.executeStreamField(query, function(n, row){}, function(err, rowLength){
+        Cassanova.executeEachRow(query, function(n, row){}, function(err, rowLength){
             if(err){
                 console.log(err);
             }
