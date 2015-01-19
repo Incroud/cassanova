@@ -330,6 +330,9 @@ WHERE
 //.WHERE_EQUALS(key, value) - Chainable.
 WHERE firstname = 'james';
 
+//.WHERE_IN(key, options) - Chainable.
+WHERE userid IN (123, 456);
+
 //.EQUALS(key, value)` - Chainable.
 firstname = 'james'
 
