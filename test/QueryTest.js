@@ -246,6 +246,30 @@ describe("Cassanova Query Tests", function(){
             (query.toString()).should.eql("SELECT firstname, lastname FROM users WHERE firstname = 'james' IN ('state', 'country');");
             done();
         });
+        it("Should create a valid SELECT statement with a WHERE_IN shortcut.", function(done) {
+            var query = new Query(baseTable);
+
+            query.SELECT(['firstname', 'lastname']).WHERE_IN("userid", [123]);
+
+            (query.toString()).should.eql("SELECT firstname, lastname FROM users WHERE userid IN (123);");
+            done();
+        });
+        it("Should create a valid SELECT statement with WHERE_IN (multiple)", function(done) {
+            var query = new Query(baseTable);
+
+            query.SELECT(['firstname', 'lastname']).WHERE_IN("userid", [123,456]);
+
+            (query.toString()).should.eql("SELECT firstname, lastname FROM users WHERE userid IN (123, 456);");
+            done();
+        });
+        it("Should create a valid SELECT statement with WHERE_IN (multiple strings)", function(done) {
+            var query = new Query(baseTable);
+
+            query.SELECT(['firstname', 'lastname']).WHERE_IN("location", ['state','country']);
+
+            (query.toString()).should.eql("SELECT firstname, lastname FROM users WHERE location IN ('state', 'country');");
+            done();
+        });
         it("Should create a valid SELECT statement with WHERE, AND, GT", function(done) {
             var query = new Query(baseTable);
 
