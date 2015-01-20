@@ -260,7 +260,7 @@ query.WHERE().EQUALS("location", "california").execute(function(err, result){ })
 
 ```
 var query = new Query(Cassanova.Client, Cassanova.Table("users"), "SELECT * FROM users");
-query.WHERE("firstname").IN(["john", "carl").execute(function(err, result){ });
+query.WHERE("firstname").IN(["john", "carl"]).execute(function(err, result){ });
 ```
 
 
