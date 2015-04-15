@@ -180,6 +180,14 @@ describe("Cassanova Query Tests", function(){
             (query.toString()).should.equal("SELECT * FROM users WHERE userid = 'abcdefg';");
             done();
         });
+        it("Should create a SELECT query with a WHERE and a optional `key` argument.", function(done){
+            var query = new Query(baseTable);
+
+            query.SELECT("*", "users").WHERE("userid").IN([123, 456]);
+
+            (query.toString()).should.equal("SELECT * FROM users WHERE userid IN (123, 456);");
+            done();
+        });
         it("Should create a SELECT query with a WHERE_EQUALS shortcut", function(done){
             var query = new Query(baseTable);
 
@@ -203,6 +211,14 @@ describe("Cassanova Query Tests", function(){
             query.SELECT(['firstname', 'lastname']).WHERE_EQUALS("firstname", "james").AND().EQUALS("age", 37);
 
             (query.toString()).should.eql("SELECT firstname, lastname FROM users WHERE firstname = 'james' AND age = 37;");
+            done();
+        });
+        it("Should create a valid SELECT statement with WHERE, AND with optional key paramater, IN", function(done) {
+            var query = new Query(baseTable);
+
+            query.SELECT(['firstname', 'lastname']).WHERE_EQUALS("firstname", "james").AND("userid").IN([123, 456]);
+
+            (query.toString()).should.eql("SELECT firstname, lastname FROM users WHERE firstname = 'james' AND userid IN (123, 456);");
             done();
         });
         it("Should create a valid SELECT statement with WHERE, IN (non-array)", function(done) {
@@ -244,6 +260,14 @@ describe("Cassanova Query Tests", function(){
             query.SELECT(['firstname', 'lastname']).WHERE_EQUALS("firstname", "james").IN(['state','country']);
 
             (query.toString()).should.eql("SELECT firstname, lastname FROM users WHERE firstname = 'james' IN ('state', 'country');");
+            done();
+        });
+        it("Should create a valid SELECT statement with WHERE, IN (optional key parameter)", function(done) {
+            var query = new Query(baseTable);
+
+            query.SELECT(['firstname', 'lastname']).WHERE().IN("userid", [123, 456]);
+
+            (query.toString()).should.eql("SELECT firstname, lastname FROM users WHERE userid IN (123, 456);");
             done();
         });
         it("Should create a valid SELECT statement with WHERE, AND, GT", function(done) {

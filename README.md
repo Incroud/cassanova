@@ -258,6 +258,12 @@ var query = new Query(Cassanova.Client, Cassanova.Table("users"), "SELECT * FROM
 query.WHERE().EQUALS("location", "california").execute(function(err, result){ });
 ```
 
+```
+var query = new Query(Cassanova.Client, Cassanova.Table("users"), "SELECT * FROM users");
+query.WHERE("firstname").IN(["john", "carl"]).execute(function(err, result){ });
+```
+
+
 There are a variety of ways that queries can be executed.
 
 #### Raw CQL via the Model
@@ -327,6 +333,9 @@ DELETE firstname, lastname FROM users;
 //.WHERE() - Chainable.
 WHERE
 
+//.WHERE(key) - Chainable
+WHERE firstname
+
 //.WHERE_EQUALS(key, value) - Chainable.
 WHERE firstname = 'james';
 
@@ -335,6 +344,9 @@ firstname = 'james'
 
 //.AND() - Chainable.
 AND
+
+//.AND(key) - Chainable.
+AND firstname
 
 //.GT(key, value) - Chainable.
 age > 21
@@ -350,6 +362,9 @@ age <= 21
 
 //.IN(options) - Chainable. A single value or an Array of values.
 IN (123, 456);
+
+//.IN(key, options) - Chainable. Optional key parameter.
+userid IN (123, 456)
 
 //.LIMIT(value) - Chainable.
 LIMIT 10
