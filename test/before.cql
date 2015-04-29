@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS cassanova_test.users (
   username text PRIMARY KEY,
   firstname text,
   lastname text,
+  birthdate timestamp,
   email text,
   password text,
   session_token text

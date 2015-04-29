@@ -10,6 +10,7 @@ exports.createUserModel = function(){
     var userSchema = Cassanova.Schema({
         username : Cassanova.SchemaType.TEXT().PRIMARY_KEY(),
         firstname : Cassanova.SchemaType.TEXT(),
+        birthdate : Cassanova.SchemaType.TIMESTAMP(),
         lastname : Cassanova.SchemaType.TEXT(),
         password : Cassanova.SchemaType.TEXT(),
         email : Cassanova.SchemaType.TEXT(),

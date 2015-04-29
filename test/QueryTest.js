@@ -15,6 +15,7 @@ describe("Cassanova Query Tests", function(){
         baseSchema = new Schema({
             userid : Schema.Type.TEXT(),
             firstname : Schema.Type.TEXT(),
+            birthday : Schema.Type.TIMESTAMP(),
             lastname : Schema.Type.TEXT(),
             age : Schema.Type.INT(),
             zipcode : Schema.Type.INT(),
@@ -373,6 +374,14 @@ describe("Cassanova Query Tests", function(){
             var query = new Query(baseTable);
 
             query.INSERT({firstname:"James", lastname:"Booth", age: 37});
+
+            (query.toString()).should.equal("INSERT INTO users (firstname, lastname, age) VALUES ('James', 'Booth', 37);");
+            done();
+        });
+        it("Should create a valid insert query with valid ISO date.", function(done) {
+            var query = new Query(baseTable);
+
+            query.INSERT({firstname:"James", lastname:"Booth", birthdate: '2015-04-29T18:00:25.000Z'});
 
             (query.toString()).should.equal("INSERT INTO users (firstname, lastname, age) VALUES ('James', 'Booth', 37);");
             done();
