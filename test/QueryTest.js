@@ -15,7 +15,7 @@ describe("Cassanova Query Tests", function(){
         baseSchema = new Schema({
             userid : Schema.Type.TEXT(),
             firstname : Schema.Type.TEXT(),
-            birthday : Schema.Type.TIMESTAMP(),
+            birthdate : Schema.Type.TIMESTAMP(),
             lastname : Schema.Type.TEXT(),
             age : Schema.Type.INT(),
             zipcode : Schema.Type.INT(),
@@ -82,7 +82,7 @@ describe("Cassanova Query Tests", function(){
             (query.toString()).should.equal("CREATE TABLE users (id uuid, username text, PRIMARY KEY (id));");
             done();
         });
-        it("Should create a valid create table with compund key", function(done){
+        it("Should create a valid create table with compound key", function(done){
             var schema = new Schema({
                 id: Schema.Type.UUID(),
                 username: Schema.Type.TEXT(),
@@ -381,9 +381,27 @@ describe("Cassanova Query Tests", function(){
         it("Should create a valid insert query with valid ISO date.", function(done) {
             var query = new Query(baseTable);
 
-            query.INSERT({firstname:"James", lastname:"Booth", birthdate: '2015-04-29T18:00:25.000Z'});
+            query.INSERT({firstname:"James", lastname:"Booth", birthdate: '2000-04-29T18:00:25.000Z'});
 
-            (query.toString()).should.equal("INSERT INTO users (firstname, lastname, age) VALUES ('James', 'Booth', 37);");
+            (query.toString()).should.equal("INSERT INTO users (firstname, lastname, birthdate) VALUES ('James', 'Booth', '2000-04-29T18:00:25.000Z');");
+            done();
+        });
+        it("Should throw an error if invalid date is passed.", function(done) {
+            var query = new Query(baseTable);
+
+            (function(){
+                query.INSERT({firstname:"James", lastname:"Booth", birthdate: 'abc-xyz'});
+            }).should.throw("Invalid date passed for key birthdate, with value of abc-xyz");
+
+            done();
+
+        });
+        it("Should create a valid insert query with valid javascript date.", function(done) {
+            var query = new Query(baseTable);
+
+            query.INSERT({firstname:"James", lastname:"Booth", birthdate: 1430331195154});
+
+            (query.toString()).should.equal("INSERT INTO users (firstname, lastname, birthdate) VALUES ('James', 'Booth', '2015-04-29T18:13:15.154Z');");
             done();
         });
         it("Should create a valid insert query with TTL", function(done) {
