@@ -368,7 +368,7 @@ describe("Cassanova SchemaType Tests", function(){
 
             (sType instanceof SchemaType).should.equal(true);
             (sType.type).should.equal("timestamp");
-            (sType.wrapper).should.equal(SchemaType.WRAPPERS.NONE);
+            (sType.wrapper).should.equal(SchemaType.WRAPPERS.SINGLE_QUOTES);
             (result).should.equal(true);
             (result2).should.equal(true);
             (result3).should.equal(true);
