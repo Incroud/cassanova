@@ -404,6 +404,14 @@ describe("Cassanova Query Tests", function(){
             (query.toString()).should.equal("INSERT INTO users (firstname, lastname, birthdate) VALUES ('James', 'Booth', '2015-04-29T18:13:15.154Z');");
             done();
         });
+        it("Should create a valid insert query with text with Apostrophe.", function(done) {
+            var query = new Query(baseTable);
+
+            query.INSERT({firstname:"John ", lastname:"O'Fadden"});
+
+            (query.toString()).should.equal("INSERT INTO users (firstname, lastname) VALUES ('John ', 'O''Fadden');");
+            done();
+        });
         it("Should create a valid insert query with TTL", function(done) {
             var query = new Query(baseTable);
 
@@ -493,8 +501,8 @@ describe("Cassanova Query Tests", function(){
             mapTable = Cassanova.Table("users_list_test", schema),
             query = new Query(mapTable);
 
-            query.INSERT({places:['rivendell', 'rohan']});
-            (query.toString()).should.equal("INSERT INTO users_list_test (places) VALUES (['rivendell', 'rohan']);");
+            query.INSERT({places:["rivendell", "Hell's kitchen"]});
+            (query.toString()).should.equal("INSERT INTO users_list_test (places) VALUES (['rivendell', 'Hell''s kitchen']);");
 
             (function(){
                 query.INSERT({places:['rivendell', 456]});
@@ -503,20 +511,17 @@ describe("Cassanova Query Tests", function(){
             done();
         });
         it("Should create a proper MAP query for an object", function(done){
+            debugger;
             var schema = new Schema({
                 user_id: Schema.Type.TEXT().PRIMARY_KEY(),
                 todo: Schema.Type.MAP(Schema.Type.TEXT(), Schema.Type.TEXT())
             }),
             mapTable = Cassanova.Table("users_map_test", schema),
             query = new Query(mapTable);
-            var todo = {'2013-9-22 12:01'  : 'birthday wishes to Bilbo', '2013-10-1 18:00' : 'Check into Inn of Prancing Pony'};
-            query.INSERT({ todo:todo});
-            (query.toString()).should.equal("INSERT INTO users_map_test (todo) VALUES ({'2013-9-22 12:01' : 'birthday wishes to Bilbo', '2013-10-1 18:00' : 'Check into Inn of Prancing Pony'});");
 
-            //Will not throw an exception since in javascript the keys are always converted to strings
-            // (function(){
-            //     query.INSERT({todo:[{123456789  : 'birthday wishes to Bilbo'}, {'2013-10-1 18:00' : 'Check into Inn of Prancing Pony'}]});
-            // }).should.throw("Mismatched key type for todo. Expecting a text");
+            //checking Apostrophe
+            query.INSERT({ todo:{'2013-9-22 12:01'  : "Meet patrick o'laughlin at Hell's kitchen", '2013-10-1 18:00' : 'Check into Inn of Prancing Pony'}});
+            (query.toString()).should.equal("INSERT INTO users_map_test (todo) VALUES ({'2013-9-22 12:01' : 'Meet patrick o''laughlin at Hell''s kitchen', '2013-10-1 18:00' : 'Check into Inn of Prancing Pony'});");
 
             (function(){
                 query.INSERT({todo:{'2013-9-22 12:01'  : 'birthday wishes to Bilbo','2013-10-1 18:00' : 123456789}});
@@ -532,8 +537,8 @@ describe("Cassanova Query Tests", function(){
                 mapTable = Cassanova.Table("users_map_test", schema),
                 query = new Query(mapTable);
 
-            query.INSERT({todo:[{'2013-9-22 12:01'  : 'birthday wishes to Bilbo'}, {'2013-10-1 18:00' : 'Check into Inn of Prancing Pony'}]});
-            (query.toString()).should.equal("INSERT INTO users_map_test (todo) VALUES ({'2013-9-22 12:01' : 'birthday wishes to Bilbo', '2013-10-1 18:00' : 'Check into Inn of Prancing Pony'});");
+            query.INSERT({todo:[{'2013-9-22 12:01'  : "Meet Patrick O'laughlin at Hell's kitchen"}, {'2013-10-1 18:00' : "Check into Inn of Prancing Pony"}]});
+            (query.toString()).should.equal("INSERT INTO users_map_test (todo) VALUES ({'2013-9-22 12:01' : 'Meet Patrick O''laughlin at Hell''s kitchen', '2013-10-1 18:00' : 'Check into Inn of Prancing Pony'});");
 
             //Will not throw an exception since in javascript the keys are always converted to strings
             // (function(){
