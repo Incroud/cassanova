@@ -15,6 +15,7 @@ describe("Cassanova Query Tests", function(){
         baseSchema = new Schema({
             userid : Schema.Type.TEXT(),
             firstname : Schema.Type.TEXT(),
+            birthdate : Schema.Type.TIMESTAMP(),
             lastname : Schema.Type.TEXT(),
             age : Schema.Type.INT(),
             zipcode : Schema.Type.INT(),
@@ -81,7 +82,7 @@ describe("Cassanova Query Tests", function(){
             (query.toString()).should.equal("CREATE TABLE users (id uuid, username text, PRIMARY KEY (id));");
             done();
         });
-        it("Should create a valid create table with compund key", function(done){
+        it("Should create a valid create table with compound key", function(done){
             var schema = new Schema({
                 id: Schema.Type.UUID(),
                 username: Schema.Type.TEXT(),
@@ -180,6 +181,14 @@ describe("Cassanova Query Tests", function(){
             (query.toString()).should.equal("SELECT * FROM users WHERE userid = 'abcdefg';");
             done();
         });
+        it("Should create a SELECT query with a WHERE and a optional `key` argument.", function(done){
+            var query = new Query(baseTable);
+
+            query.SELECT("*", "users").WHERE("userid").IN([123, 456]);
+
+            (query.toString()).should.equal("SELECT * FROM users WHERE userid IN (123, 456);");
+            done();
+        });
         it("Should create a SELECT query with a WHERE_EQUALS shortcut", function(done){
             var query = new Query(baseTable);
 
@@ -203,6 +212,14 @@ describe("Cassanova Query Tests", function(){
             query.SELECT(['firstname', 'lastname']).WHERE_EQUALS("firstname", "james").AND().EQUALS("age", 37);
 
             (query.toString()).should.eql("SELECT firstname, lastname FROM users WHERE firstname = 'james' AND age = 37;");
+            done();
+        });
+        it("Should create a valid SELECT statement with WHERE, AND with optional key paramater, IN", function(done) {
+            var query = new Query(baseTable);
+
+            query.SELECT(['firstname', 'lastname']).WHERE_EQUALS("firstname", "james").AND("userid").IN([123, 456]);
+
+            (query.toString()).should.eql("SELECT firstname, lastname FROM users WHERE firstname = 'james' AND userid IN (123, 456);");
             done();
         });
         it("Should create a valid SELECT statement with WHERE, IN (non-array)", function(done) {
@@ -244,6 +261,14 @@ describe("Cassanova Query Tests", function(){
             query.SELECT(['firstname', 'lastname']).WHERE_EQUALS("firstname", "james").IN(['state','country']);
 
             (query.toString()).should.eql("SELECT firstname, lastname FROM users WHERE firstname = 'james' IN ('state', 'country');");
+            done();
+        });
+        it("Should create a valid SELECT statement with WHERE, IN (optional key parameter)", function(done) {
+            var query = new Query(baseTable);
+
+            query.SELECT(['firstname', 'lastname']).WHERE().IN("userid", [123, 456]);
+
+            (query.toString()).should.eql("SELECT firstname, lastname FROM users WHERE userid IN (123, 456);");
             done();
         });
         it("Should create a valid SELECT statement with WHERE, AND, GT", function(done) {
@@ -351,6 +376,32 @@ describe("Cassanova Query Tests", function(){
             query.INSERT({firstname:"James", lastname:"Booth", age: 37});
 
             (query.toString()).should.equal("INSERT INTO users (firstname, lastname, age) VALUES ('James', 'Booth', 37);");
+            done();
+        });
+        it("Should create a valid insert query with valid ISO date.", function(done) {
+            var query = new Query(baseTable);
+
+            query.INSERT({firstname:"James", lastname:"Booth", birthdate: '2000-04-29T18:00:25.000Z'});
+
+            (query.toString()).should.equal("INSERT INTO users (firstname, lastname, birthdate) VALUES ('James', 'Booth', '2000-04-29T18:00:25.000Z');");
+            done();
+        });
+        it("Should throw an error if invalid date is passed.", function(done) {
+            var query = new Query(baseTable);
+
+            (function(){
+                query.INSERT({firstname:"James", lastname:"Booth", birthdate: 'abc-xyz'});
+            }).should.throw("Invalid date passed for key birthdate, with value of abc-xyz");
+
+            done();
+
+        });
+        it("Should create a valid insert query with valid javascript date.", function(done) {
+            var query = new Query(baseTable);
+
+            query.INSERT({firstname:"James", lastname:"Booth", birthdate: 1430331195154});
+
+            (query.toString()).should.equal("INSERT INTO users (firstname, lastname, birthdate) VALUES ('James', 'Booth', '2015-04-29T18:13:15.154Z');");
             done();
         });
         it("Should create a valid insert query with TTL", function(done) {
