@@ -1,61 +1,62 @@
 {
-    "name": "cassanova",
-    "version": "0.6.3",
-    "description": "An object modeler for Cassandra CQL.",
-    "author": "Incroud team <james@incroud.com>",
-    "homepage": "http://github.com/incroud/cassanova",
-    "main": "./index.js",
-    "licenses": [
-        {
-            "type": "MIT",
-            "url": "https://raw.githubusercontent.com/incroud/cassanova/master/LICENSE"
-        }
-    ],
-    "contributors": [
-        {
-            "name": "James Booth",
-            "email": "jeboothjr@gmail.com"
-        },
-        {
-            "name": "Karan Keswani",
-            "email": "keswanikaran@gmail.com"
-        }
-    ],
-    "keywords": [
-        "cassandra",
-        "cql",
-        "cql3",
-        "data model"
-    ],
-    "engines": {
-        "node": ">=0.10.0"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/incroud/cassanova.git"
-    },
-    "bugs": {
-        "url": "https://github.com/incroud/cassanova/issues"
-    },
-    "dependencies": {
-        "colors": "1.0.3",
-        "lodash": "2.4.1",
-        "cassandra-driver": "1.0.2"
-    },
-    "devDependencies": {
-        "async": "0.9.0",
-        "commander": "2.5.0",
-        "config": "^1.8.1",
-        "grunt-mocha-istanbul": "2.2.0",
-        "grunt-githooks": "0.3.1",
-        "grunt": "0.4.5",
-        "grunt-contrib-clean": "0.6.0",
-        "grunt-contrib-jshint": "0.10.0",
-        "mocha": "2.0.1",
-        "progress": "1.1.8",
-        "should": "4.3.0"
-    },
-    "scripts": {
-        "test": "mocha test -R spec -t 5000 -s 0"
+  "name": "cassanova",
+  "version": "0.6.3",
+  "description": "An object modeler for Cassandra CQL.",
+  "author": "Incroud team <james@incroud.com>",
+  "homepage": "http://github.com/incroud/cassanova",
+  "main": "./index.js",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://raw.githubusercontent.com/incroud/cassanova/master/LICENSE"
     }
+  ],
+  "contributors": [
+    {
+      "name": "James Booth",
+      "email": "jeboothjr@gmail.com"
+    },
+    {
+      "name": "Karan Keswani",
+      "email": "keswanikaran@gmail.com"
+    }
+  ],
+  "keywords": [
+    "cassandra",
+    "cql",
+    "cql3",
+    "data model"
+  ],
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/incroud/cassanova.git"
+  },
+  "bugs": {
+    "url": "https://github.com/incroud/cassanova/issues"
+  },
+  "dependencies": {
+    "async": "^0.9.0",
+    "cassandra-driver": "1.0.2",
+    "colors": "1.0.3",
+    "lodash": "2.4.1"
+  },
+  "devDependencies": {
+    "async": "0.9.0",
+    "commander": "2.5.0",
+    "config": "^1.8.1",
+    "grunt-mocha-istanbul": "2.2.0",
+    "grunt-githooks": "0.3.1",
+    "grunt": "0.4.5",
+    "grunt-contrib-clean": "0.6.0",
+    "grunt-contrib-jshint": "0.10.0",
+    "mocha": "2.0.1",
+    "progress": "1.1.8",
+    "should": "4.3.0"
+  },
+  "scripts": {
+    "test": "mocha test -R spec -t 5000 -s 0"
+  }
 }

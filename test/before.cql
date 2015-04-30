@@ -22,6 +22,16 @@ CREATE TABLE IF NOT EXISTS cassanova_test.users (
 );
 </cql>
 
+-- table
+<cql>
+CREATE TABLE IF NOT EXISTS cassanova_test.test_collections (
+  username text PRIMARY KEY,
+  test_map map <text, text>,
+  test_set set <text>,
+  test_list list <text>
+);
+</cql>
+
 <cql>
 CREATE INDEX IF NOT EXISTS users_email
   ON cassanova_test.users (email);

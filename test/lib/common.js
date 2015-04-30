@@ -22,6 +22,18 @@ exports.createUserModel = function(){
     return userModel;
 };
 
+exports.testCollectionModel = function(){
+    var testCollectionSchema = Cassanova.Schema({
+            username : Cassanova.SchemaType.TEXT().PRIMARY_KEY(),
+            test_map : Cassanova.SchemaType.MAP(Cassanova.SchemaType.TEXT(),Cassanova.SchemaType.TEXT()),
+            test_set : Cassanova.SchemaType.SET(Cassanova.SchemaType.TEXT()),
+            test_list : Cassanova.SchemaType.LIST(Cassanova.SchemaType.TEXT())
+        }),
+        testCollectionTable = Cassanova.Table("test_collections", testCollectionSchema),
+        testCollectionModel = Cassanova.Model("testCollectionModel", testCollectionTable);
+
+    return testCollectionModel;
+};
 exports.createCassanovaClient = function(){
     return Cassanova.createClient(options);
 };

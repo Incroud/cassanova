@@ -7,7 +7,9 @@ var should = require('should'),
     Cassanova = require('../index'),
     Query = require('../lib/query'),
     common = require("./lib/common"),
-    userModel;
+    userModel,
+    async = require('async'),
+    testCollectionModel;
 
 before(function(done){
 
@@ -19,7 +21,7 @@ before(function(done){
         console.log('Setting up db for End to End tests : ');
 
         userModel = common.createUserModel();
-
+        testCollectionModel = common.testCollectionModel();
         done();
     });
 });
@@ -52,7 +54,7 @@ describe("Cassanova End To End Tests",function(){
 
     it("Should be able to insert a user in db via the static method", function(done) {
         userModel.save({
-            username : "Pat O'lary",
+            username : "James",
             password : "password",
             email : "google@gmail.com",
             birthdate : "2015-01-01",
@@ -236,7 +238,7 @@ describe("Cassanova End To End Tests",function(){
         });
     });
 
-    it('Should be able to run queries in batch with noop callback',function(done){
+    it('Should be able to run queries in batch with no callback',function(done){
         var query1 = userModel.Query();
 
         query1.INSERT({username:"James", firstname:"James", lastname:"Booth"});
@@ -263,6 +265,62 @@ describe("Cassanova End To End Tests",function(){
         });
     });
 
+    it("Should be able to insert in collections. ( map, set and list )", function(done) {
+        async.series(
+            [
+                function(callback){
+                    testCollectionModel.save({
+                        username : "Karan Keswani",
+                        test_map : {"address" : "Crazy Place"},
+                        test_set : ["item1", "item2"],
+                        test_list : ["item1", "item2"]
+                    }, function(err, result){
+                        if(err){
+                            console.log(err);
+                        }
+                        (err === null).should.equal(true);
+                        callback(null, true);
+                    });
+                },
+                function(callback){
+                    testCollectionModel.find({
+                            username : "Karan Keswani"
+                        },
+                        function(err, result){
+                            if(err){
+                                console.log(err);
+                            }
+                            (err === null).should.equal(true);
+                            result[0].test_map.address.should.equal( "Crazy Place");
+                            result[0].test_set[0].should.equal("item1");
+                            result[0].test_set[1].should.equal("item2");
+                            result[0].test_list[0].should.equal("item1");
+                            result[0].test_list[1].should.equal("item2");
+                            callback(null, true);
+                        })
+                }
+            ],
+            function(err, res){
+                should.not.exist(err);
+                done();
+            }
+        )
+    });
+    //it("Should be able to insert apostrophe in collections. ( map, set and list )", function(done) {
+    //    testCollectionModel.save({
+    //        username : "Pat O'lary",
+    //        password : "password",
+    //        email : "google@gmail.com",
+    //        birthdate : "2015-01-01",
+    //        session_token : "12345ab"
+    //    }, function(err, result){
+    //        if(err){
+    //            console.log(err);
+    //        }
+    //        (err === null).should.equal(true);
+    //        done();
+    //    });
+    //});
     it('Should be able to execute',function(done){
         var query = userModel.Query();
         query.INSERT({username:"James1", firstname:"James", lastname:"Booth"});
@@ -276,7 +334,7 @@ describe("Cassanova End To End Tests",function(){
         });
     });
 
-    it('Should be able to execute with noop callback',function(done){
+    it('Should be able to execute with no callback',function(done){
         var query = userModel.Query();
         query.INSERT({username:"James1", firstname:"James", lastname:"Booth"});
 

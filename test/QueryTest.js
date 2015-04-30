@@ -537,8 +537,8 @@ describe("Cassanova Query Tests", function(){
                 mapTable = Cassanova.Table("users_map_test", schema),
                 query = new Query(mapTable);
 
-            query.INSERT({todo:[{'2013-9-22 12:01'  : "Meet patrick o'laughlin at Hell's kitchen"}, {'2013-10-1 18:00' : "Check into Inn of Prancing Pony"}]});
-            (query.toString()).should.equal("INSERT INTO users_map_test (todo) VALUES ({'2013-9-22 12:01' : 'Meet patrick o''laughlin at Hell''s kitchen', '2013-10-1 18:00' : 'Check into Inn of Prancing Pony'});");
+            query.INSERT({todo:[{'2013-9-22 12:01'  : "Meet Patrick O'laughlin at Hell's kitchen"}, {'2013-10-1 18:00' : "Check into Inn of Prancing Pony"}]});
+            (query.toString()).should.equal("INSERT INTO users_map_test (todo) VALUES ({'2013-9-22 12:01' : 'Meet Patrick O''laughlin at Hell''s kitchen', '2013-10-1 18:00' : 'Check into Inn of Prancing Pony'});");
 
             //Will not throw an exception since in javascript the keys are always converted to strings
             // (function(){
