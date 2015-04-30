@@ -52,11 +52,11 @@ describe("Cassanova End To End Tests",function(){
 
     it("Should be able to insert a user in db via the static method", function(done) {
         userModel.save({
-            username : 'James',
-            password : 'password',
-            email : 'google@gmail.com',
-            birthdate : '2015-01-01',
-            session_token : '12345ab'
+            username : "Pat O'lary",
+            password : "password",
+            email : "google@gmail.com",
+            birthdate : "2015-01-01",
+            session_token : "12345ab"
         }, function(err, result){
             if(err){
                 console.log(err);
