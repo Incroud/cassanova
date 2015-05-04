@@ -34,11 +34,7 @@ describe("Cassanova Query Tests", function(){
 
     describe("Basic Query Tests", function(){
         it("Should be able to be cloned and chained independently", function(done){
-            var schema = new Schema({
-                id: Schema.Type.UUID().PRIMARY_KEY(),
-                username: Schema.Type.TEXT()
-            }),
-            query = new Query(baseTable),
+            var query = new Query(baseTable),
             query2;
 
             query.SELECT("*", "users");
